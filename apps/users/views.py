@@ -1,4 +1,4 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect,render
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.views.generic import TemplateView, CreateView
 from django.contrib.auth.views import LoginView, LogoutView
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
+def landing_page(request):
+    return render(request, 'users/landing.html')
 class HomeView(TemplateView):
     template_name = 'users/home.html'
     def get_context_data(self, **kwargs):

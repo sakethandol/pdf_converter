@@ -4,7 +4,12 @@
     <title>Login - PDF Converter</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class=" min-h-screen bg-gradient-to-b from-black to-gray-800 text-white bg-gray-100 min-h-screen flex items-center justify-center">
+<body class="relative min-h-screen bg-gradient-to-tr from-pink-200 via-purple-200 to-blue-200 min-h-screen bg-gradient-to-b min-h-screen flex items-center justify-center">
+  <div class="absolute inset-0 -z-10 overflow-hidden">
+    <div class="absolute left-1/2 top-0 -translate-x-1/2 blur-3xl w-[1000px] h-[800px] opacity-60"
+         style="background: radial-gradient(circle at center, #fbcfe8 20%, #c4b5fd 40%, #a5b4fc 50%)">
+    </div>
+  </div>
     <div class="max-w-md w-full bg-white rounded-lg shadow-md p-6">
         <h2 class="text-2xl font-bold text-center text-gray-800  mb-6">Login</h2>
         {% if messages %}
