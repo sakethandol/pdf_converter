@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload File - PDF Converter{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="text-blue-500 text-6xl mb-4">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Upload Your File
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300">
+                Select a file and choose your conversion type
+            </p>
+        </div>
+
+        <!-- Upload Form -->
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Conversion Type -->
+            <div>
+                <label for="{{ form.conversion_type.id_for_label }}" 
+                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {{ form.conversion_type.label }}
+                </label>
+                {{ form.conversion_type }}
+                {% if form.conversion_type.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.conversion_type.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- File Upload -->
+            <div>
+                <label for="{{ form.original_file.id_for_label }}" 
+                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {{ form.original_file.label }}
+                </label>
+                
+                <!-- Custom File Upload Area -->
+                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors duration-200">
+                    <div class="mb-4">
+                        <i class="fas fa-file text-4xl text-gray-400 dark:text-gray-500"></i>
+                    </div>
+                    
+                    {{ form.original_file }}
+                    
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                        Drag and drop your file here, or click to browse
+                    </p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                        Supported formats: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, JPEG
+                    </p>
+                </div>
+                
+                {% if form.original_file.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.original_file.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 text-lg">
+                    <i class="fas fa-magic mr-2"></i>
+                    Convert File
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Supported Conversions
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div class="flex items-center text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                    PDF to Word (DOCX)
+                </div>
+                <div class="flex items-center text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-file-word text-blue-500 mr-2"></i>
+                    Word to PDF
+                </div>
+                <div class="flex items-center text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                    PDF to Excel (XLSX)
+                </div>
+                <div class="flex items-center text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-file-excel text-green-500 mr-2"></i>
+                    Excel to PDF
+                </div>
+                <div class="flex items-center text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                    PDF to Image (PNG)
+                </div>
+                <div class="flex items-center text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-file-image text-purple-500 mr-2"></i>
+                    Image to PDF
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// File upload preview
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.querySelector('input[type="file"]');
+    const dropArea = fileInput.closest('.border-dashed');
+    
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const fileName = this.files[0].name;
+            const fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
+            
+            dropArea.innerHTML = `
+                <div class="mb-4">
+                    <i class="fas fa-file-check text-4xl text-green-500"></i>
+                </div>
+                <p class="text-sm text-green-600 font-medium">${fileName}</p>
+                <p class="text-xs text-gray-500">${fileSize} MB</p>
+                <button type="button" onclick="clearFile()" class="mt-2 text-xs text-blue-600 hover:text-blue-800">
+                    Choose different file
+                </button>
+            `;
+        }
+    });
+});
+
+function clearFile() {
+    location.reload();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conversion History - PDF Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold">PDF Converter</h1>
+            <div>
+                <a href="/" class="mr-4 text-blue-500 hover:underline">Home</a>
+                <a href="/dashboard/" class="mr-4 text-blue-500 hover:underline">Dashboard</a>
+                <span class="mr-4">{{ user.username }}</span>
+                <a href="/logout/" class="bg-red-500 text-white px-4 py-2 rounded">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto py-8 px-4">
+        <h2 class="text-3xl font-bold mb-6">Conversion History</h2>
+        
+        {% if conversions %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left">File Name</th>
+                        <th class="px-4 py-3 text-left">Conversion Type</th>
+                        <th class="px-4 py-3 text-left">Status</th>
+                        <th class="px-4 py-3 text-left">Date</th>
+                        <th class="px-4 py-3 text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conversion in conversions %}
+                    <tr class="border-b">
+                        <td class="px-4 py-3">{{ conversion.original_filename }}</td>
+                        <td class="px-4 py-3">{{ conversion.get_conversion_type_display }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-xs rounded-full 
+                                {% if conversion.status == 'completed' %}bg-green-100 text-green-800
+                                {% elif conversion.status == 'failed' %}bg-red-100 text-red-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ conversion.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">{{ conversion.created_at|date:"M d, Y" }}</td>
+                        <td class="px-4 py-3">
+                            {% if conversion.status == 'completed' %}
+                                <a href="/converter/download/{{ conversion.id }}/" class="text-blue-500 hover:underline">Download</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+            <h3 class="text-xl font-semibold mb-4">No Conversions Yet</h3>
+            <p class="text-gray-600 mb-4">You haven't converted any files yet.</p>
+            <a href="/converter/upload/" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">
+                Start Converting
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

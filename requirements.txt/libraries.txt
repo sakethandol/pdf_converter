@@ -1,0 +1,20 @@
+# Core Django
+Django>=5.0.0
+
+# File conversion libraries
+PyPDF2>=3.0.0
+pdf2docx>=0.5.6
+python-docx>=0.8.11
+openpyxl>=3.1.0
+Pillow>=10.0.0
+reportlab>=4.0.0
+
+# Optional: Better PDF to image conversion
+PyMuPDF>=1.23.0
+
+# Additional useful libraries
+python-magic>=0.4.27  # For file type detection
+
+# Development dependencies (optional)
+# python-decouple>=3.8  # For environment variables
+# django-extensions>=3.2.0  # Useful Django extensions

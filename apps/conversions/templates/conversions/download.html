@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Download File - PDF Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="max-w-4xl mx-auto py-8 px-4">
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+            <h2 class="text-3xl font-bold mb-6">Download Ready!</h2>
+            
+            {% if conversion %}
+            <div class="mb-6">
+                <p class="text-lg mb-2"><strong>File:</strong> {{ conversion.converted_filename }}</p>
+                <p class="text-gray-600">Downloads: {{ conversion.download_count }}</p>
+            </div>
+            
+            <div class="space-y-4">
+                <button onclick="downloadFile()" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 transition text-lg font-semibold">
+                    📥 Download Now
+                </button>
+                <br>
+                <a href="/converter/upload/" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">
+                    Convert Another File
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function downloadFile() {
+            // For now, just show an alert (we'll implement actual download later)
+            alert('Download functionality will be implemented next!');
+        }
+    </script>
+</body>
+</html>
