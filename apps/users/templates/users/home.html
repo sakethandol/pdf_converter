@@ -43,14 +43,11 @@
                         <label class="block text-blue-800 text-sm font-bold mb-2">Conversion Type:</label>
                         {{ form.conversion_type }}
                     </div>
-
-                    
                     <div>
                         <label class="block text-blue-800 text-sm font-bold mb-2">Select File:</label>
                         {{ form.original_file }}
                     </div>
                 </div>
-                
                 <div class="text-center">
                     <button type="submit" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105">
                         🚀 Convert Now
@@ -59,8 +56,6 @@
             </form>
         </div>
         {% endif %}
-
-        <!-- Premium Features Teaser -->
         {% if not is_authenticated %}
         <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
             <div class="text-center">

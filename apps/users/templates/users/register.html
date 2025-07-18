@@ -7,7 +7,6 @@
 <body class=" min-h-screen bg-gradient-to-b from-black to-gray-800 text-white bg-gray-100 min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full bg-white rounded-lg shadow-md p-6">
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Create Account</h2>
-        
         {% if messages %}
             {% for message in messages %}
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -15,45 +14,36 @@
                 </div>
             {% endfor %}
         {% endif %}
-        
         <form method="post">
             {% csrf_token %}
-            
             <div class="mb-4">
                 {{ form.username.label_tag }}
                 {{ form.username }}
             </div>
-            
             <div class="mb-4">
                 {{ form.first_name.label_tag }}
                 {{ form.first_name }}
             </div>
-            
             <div class="mb-4">
                 {{ form.last_name.label_tag }}
                 {{ form.last_name }}
             </div>
-            
             <div class="mb-4">
                 {{ form.email.label_tag }}
                 {{ form.email }}
             </div>
-            
             <div class="mb-4">
                 {{ form.password1.label_tag }}
                 {{ form.password1 }}
             </div>
-            
             <div class="mb-6">
                 {{ form.password2.label_tag }}
                 {{ form.password2 }}
             </div>
-            
             <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
                 Create Account
             </button>
         </form>
-        
         <p class="text-center mt-4 text-gray-900">
             Already have an account? 
             <a href="/login/" class="text-blue-500 hover:underline">Login</a>
