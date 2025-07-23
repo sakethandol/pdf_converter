@@ -5,21 +5,51 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 import os
 import shutil
+import uuid
 from pathlib import Path
 
 def user_upload_path(instance, filename):
     """Generate upload path: uploads/user_id/year/month/filename"""
-    if instance.user:
-        return f'uploads/{instance.user.id}/{timezone.now().year}/{timezone.now().month}/{filename}'
+    # ✅ FIX: More robust user handling
+    unique_id = uuid.uuid4().hex[:6]
+    name, ext = os.path.splitext(filename)
+    unique_filename = f"{name}_{unique_id}{ext}"
+    
+    # ✅ CRITICAL FIX: Better user detection
+    user_id = None
+    if hasattr(instance, 'user') and instance.user:
+        user_id = instance.user.id
+    elif hasattr(instance, '_original_user') and instance._original_user:
+        user_id = instance._original_user.id
+    
+    if user_id:
+        return f'uploads/user_{user_id}/{timezone.now().year}/{timezone.now().month}/{unique_filename}'
     else:
-        return f'uploads/guest/{timezone.now().year}/{timezone.now().month}/{filename}'
+        return f'uploads/guest/{timezone.now().year}/{timezone.now().month}/{unique_filename}'
 
 def user_converted_path(instance, filename):
     """Generate converted file path: converted/user_id/year/month/filename"""
-    if instance.user:
-        return f'converted/{instance.user.id}/{timezone.now().year}/{timezone.now().month}/{filename}'
+    # ✅ FIX: More robust user handling
+    unique_id = uuid.uuid4().hex[:6]
+    name, ext = os.path.splitext(filename)
+    unique_filename = f"{name}_{unique_id}{ext}"
+
+    name, ext = os.path.splitext(filename)
+    if not ext:  # Add extension if missing
+        ext = instance.get_converted_extension()
+    unique_filename = f"{name}_{unique_id}{ext}"
+    
+    # ✅ CRITICAL FIX: Better user detection
+    user_id = None
+    if hasattr(instance, 'user') and instance.user:
+        user_id = instance.user.id
+    elif hasattr(instance, '_original_user') and instance._original_user:
+        user_id = instance._original_user.id
+    
+    if user_id:
+        return f'converted/user_{user_id}/{timezone.now().year}/{timezone.now().month}/{unique_filename}'
     else:
-        return f'converted/guest/{timezone.now().year}/{timezone.now().month}/{filename}'
+        return f'converted/guest/{timezone.now().year}/{timezone.now().month}/{unique_filename}'
 
 class ConversionRequest(models.Model):
     CONVERSION_TYPES = [
@@ -76,44 +106,166 @@ class ConversionRequest(models.Model):
         """Generate the converted filename"""
         name_without_ext = os.path.splitext(self.original_filename)[0]
         new_extension = self.get_converted_extension()
-        return f"{name_without_ext}_converted{new_extension}"
+        unique_id = uuid.uuid4().hex[:6]
+        return f"{name_without_ext}_converted_{unique_id}{new_extension}"
+    
+    def safe_process_conversion(self):
+        """Ultra-safe conversion method that preserves user at all costs"""
+        # ✅ STEP 1: Lock in the user immediately
+        original_user = self.user
+        original_user_id = self.user.id if self.user else None
+        
+        # ✅ STEP 2: Store user as backup attribute
+        self._original_user = original_user
+        
+        print(f"🔒 LOCKED USER: {original_user} (ID: {original_user_id})")
+        
+        try:
+            # Update to processing
+            self.status = 'processing'
+            if original_user:
+                self.user = original_user
+            
+            # ✅ STEP 3: Save with explicit user preservation
+            ConversionRequest.objects.filter(id=self.id).update(
+                status='processing',
+                user=original_user
+            )
+            
+            # Generate filename
+            self.converted_filename = self.generate_converted_filename()
+            original_path = self.original_file.path
+            
+            if not os.path.exists(original_path):
+                raise Exception(f"Original file not found at: {original_path}")
+            
+            # Perform conversion
+            converted_content = self.perform_conversion(original_path)
+            
+            if not converted_content:
+                raise Exception("Conversion failed - no content returned")
+            
+            # ✅ STEP 4: Save file with user locked
+            if original_user:
+                self.user = original_user
+                
+            # Save converted file to storage AND update model
+            self.converted_file.save(
+                self.converted_filename,
+                ContentFile(converted_content),
+                save=True  # CHANGED: Must save model to update FileField
+            )
+        
+            
+            # ✅ STEP 5: Final update with explicit SQL
+            self.status = 'completed'
+            self.completed_at = timezone.now()
+            self.save(update_fields=['status', 'completed_at'])
+            
+            # Refresh instance
+            self.refresh_from_db()
+            
+            print(f"✅ CONVERSION COMPLETED - User preserved: {self.user}")
+            return True
+            
+        except Exception as e:
+            print(f"❌ CONVERSION FAILED: {e}")
+            
+            # ✅ STEP 6: Even failures preserve user
+            ConversionRequest.objects.filter(id=self.id).update(
+                status='failed',
+                error_message=str(e),
+                user=original_user  # Preserve user even on failure
+            )
+            
+            self.refresh_from_db()
+            return False
+        
+        finally:
+            # ✅ STEP 7: Final safety check
+            if self.user != original_user:
+                print(f"🚨 USER LOST! Restoring {original_user}")
+                ConversionRequest.objects.filter(id=self.id).update(user=original_user)
+                self.user = original_user
     
     def process_conversion(self):
-        """Process the actual file conversion"""
+        """Legacy conversion method - kept for backward compatibility"""
+        # ✅ CRITICAL FIX: Store the original user at the very beginning
+        original_user = self.user
+        
         try:
+            print(f"Starting conversion for: {self.original_filename}")
+            print(f"User before processing: {self.user} (ID: {self.user.id if self.user else None})")
+            
+            # ✅ FIX: Update status WITHOUT calling save() yet
             self.status = 'processing'
-            self.save()
             
             # Generate converted filename
             self.converted_filename = self.generate_converted_filename()
+            print(f"Generated filename: {self.converted_filename}")
             
-            # For now, we'll simulate conversion by copying the original file
-            # with a new extension. You can replace this with actual conversion logic later
+            # Get the original file path
             original_path = self.original_file.path
+            print(f"Original file path: {original_path}")
             
-            # Create a temporary converted file (simulation)
-            # In real implementation, you'd use libraries like python-docx, pypdf2, etc.
-            converted_content = self.simulate_conversion(original_path)
+            # Check if original file exists
+            if not os.path.exists(original_path):
+                raise Exception(f"Original file not found at: {original_path}")
+            
+            # ✅ CRITICAL FIX: Save the processing status with user preserved
+            if original_user:
+                self.user = original_user
+            self.save(update_fields=['status', 'user'])  # Only update specific fields
+            
+            # Perform actual conversion
+            converted_content = self.perform_conversion(original_path)
             
             if converted_content:
+                print(f"Conversion successful, saving file...")
+                
+                # ✅ CRITICAL FIX: Ensure user is set BEFORE file operations
+                if original_user:
+                    self.user = original_user
+                
                 # Save the converted file
-                converted_file_path = user_converted_path(self, self.converted_filename)
                 self.converted_file.save(
                     self.converted_filename,
                     ContentFile(converted_content),
-                    save=False
+                    save=False  # Don't save the model yet
                 )
                 
+                # Set completion fields
                 self.status = 'completed'
                 self.completed_at = timezone.now()
+                
+                print(f"Conversion completed successfully")
             else:
-                raise Exception("Conversion failed")
+                raise Exception("Conversion failed - no content returned")
                 
         except Exception as e:
+            print(f"Conversion error: {e}")
             self.status = 'failed'
             self.error_message = str(e)
+            raise e
         
-        self.save()
+        finally:
+            # ✅ CRITICAL FIX: ALWAYS restore user in finally block
+            if original_user:
+                self.user = original_user
+            
+            # Final save with all fields
+            self.save()
+            
+            # ✅ VERIFICATION: Check if user was preserved
+            self.refresh_from_db()
+            if original_user and self.user != original_user:
+                print(f"CRITICAL ERROR: User was lost after save! Expected: {original_user}, Got: {self.user}")
+                # Emergency fix - force user assignment
+                ConversionRequest.objects.filter(id=self.id).update(user=original_user)
+                self.user = original_user
+                print(f"User emergency restoration: {self.user}")
+        
+        print(f"Final user after processing: {self.user} (ID: {self.user.id if self.user else None})")
         return self.status == 'completed'
     
     def perform_conversion(self, original_path):
@@ -121,6 +273,9 @@ class ConversionRequest(models.Model):
         Perform actual file conversion using proper conversion libraries.
         """
         try:
+            print(f"Starting conversion: {self.conversion_type}")
+            print(f"Input file: {original_path}")
+            
             from .converters import FileConverter
             
             # Use the new convert_file method
@@ -129,19 +284,24 @@ class ConversionRequest(models.Model):
                 original_path
             )
             
+            print(f"Conversion result: success={success}, message='{message}'")
+            
             if success and content_bytes:
+                print(f"Conversion successful, content size: {len(content_bytes)} bytes")
                 return content_bytes
             else:
-                raise Exception(message or "Conversion failed")
+                error_msg = message or "Conversion failed"
+                print(f"Conversion failed: {error_msg}")
+                raise Exception(error_msg)
                 
-        except Exception as e:
-            print(f"Conversion error: {e}")
+        except ImportError as e:
+            error_msg = f"Missing conversion library: {str(e)}"
+            print(error_msg)
             return None
-    
-    # Alias for backward compatibility
-    def simulate_conversion(self, original_path):
-        """Alias for perform_conversion for backward compatibility"""
-        return self.perform_conversion(original_path)
+        except Exception as e:
+            error_msg = f"Conversion error: {str(e)}"
+            print(error_msg)
+            return None
     
     def get_download_url(self):
         """Get the appropriate download URL based on user type"""

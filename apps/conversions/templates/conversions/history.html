@@ -1,71 +1,173 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Conversion History - PDF Converter</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold">PDF Converter</h1>
-            <div>
-                <a href="/" class="mr-4 text-blue-500 hover:underline">Home</a>
-                <a href="/dashboard/" class="mr-4 text-blue-500 hover:underline">Dashboard</a>
-                <span class="mr-4">{{ user.username }}</span>
-                <a href="/logout/" class="bg-red-500 text-white px-4 py-2 rounded">Logout</a>
-            </div>
-        </div>
-    </nav>
+{% extends 'base.html' %}
 
-    <div class="max-w-6xl mx-auto py-8 px-4">
-        <h2 class="text-3xl font-bold mb-6">Conversion History</h2>
-        
-        {% if conversions %}
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <table class="w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left">File Name</th>
-                        <th class="px-4 py-3 text-left">Conversion Type</th>
-                        <th class="px-4 py-3 text-left">Status</th>
-                        <th class="px-4 py-3 text-left">Date</th>
-                        <th class="px-4 py-3 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for conversion in conversions %}
-                    <tr class="border-b">
-                        <td class="px-4 py-3">{{ conversion.original_filename }}</td>
-                        <td class="px-4 py-3">{{ conversion.get_conversion_type_display }}</td>
-                        <td class="px-4 py-3">
-                            <span class="px-2 py-1 text-xs rounded-full 
-                                {% if conversion.status == 'completed' %}bg-green-100 text-green-800
-                                {% elif conversion.status == 'failed' %}bg-red-100 text-red-800
-                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
-                                {{ conversion.get_status_display }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3">{{ conversion.created_at|date:"M d, Y" }}</td>
-                        <td class="px-4 py-3">
-                            {% if conversion.status == 'completed' %}
-                                <a href="/converter/download/{{ conversion.id }}/" class="text-blue-500 hover:underline">Download</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+{% block title %}Conversion History - PDF Converter{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                <i class="fas fa-history mr-3"></i> Conversion History
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300">View and download your converted files</p>
         </div>
+
+        <!-- Statistics (omitted here for brevity, unchanged) -->
+
+        <!-- Conversions List -->
+        {% if total_conversions > 0 %}
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Your Conversions</h2>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                        Showing {{ conversions.start_index }}-{{ conversions.end_index }} of {{ conversions.paginator.count }} conversions
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    {% for conversion in conversions %}
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-6 transition-shadow hover:shadow-md"
+                         data-conversion-id="{{ conversion.id }}" data-status="{{ conversion.status }}">
+                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+
+                            <!-- File Info (unchanged) -->
+
+                            <!-- Status and Actions -->
+                            <div class="flex flex-col lg:flex-row lg:items-center gap-4">
+
+                                <!-- Status Badge -->
+                                <div class="flex justify-center lg:justify-start">
+                                    {% if conversion.status == 'completed' %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                            <i class="fas fa-check-circle mr-1"></i> Completed
+                                        </span>
+                                    {% elif conversion.status == 'processing' %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                            <i class="fas fa-spinner fa-spin mr-1"></i> Processing
+                                        </span>
+                                    {% elif conversion.status == 'failed' %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                            <i class="fas fa-exclamation-circle mr-1"></i> Failed
+                                        </span>
+                                    {% elif conversion.status == 'pending' %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                            <i class="fas fa-clock mr-1"></i> Pending
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex gap-2 flex-wrap">
+                                    {% if conversion.status == 'completed' %}
+                                        <a href="{% url 'conversions:download' file_id=conversion.id %}" 
+                                           class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                            <i class="fas fa-download mr-2"></i> Download
+                                        </a>
+                                    {% elif conversion.status == 'processing' %}
+                                        <a href="{% url 'conversions:convert_detail' conversion_id=conversion.id %}" 
+                                           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                            <i class="fas fa-eye mr-2"></i> View Status
+                                        </a>
+                                    {% elif conversion.status == 'failed' %}
+                                        <a href="{% url 'conversions:convert_detail' conversion_id=conversion.id %}" 
+                                           class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                            <i class="fas fa-info-circle mr-2"></i> View Error
+                                        </a>
+
+                                        <!-- ✅ Retry Button -->
+                                        <form method="post" action="{% url 'conversions:retry' conversion_id=conversion.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                    class="inline-flex items-center px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                                <i class="fas fa-redo-alt mr-2"></i> Retry
+                                            </button>
+                                        </form>
+                                    {% endif %}
+
+                                    <a href="{% url 'conversions:convert_detail' conversion_id=conversion.id %}" 
+                                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium rounded-lg transition-colors duration-200">
+                                        <i class="fas fa-info mr-2"></i> Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error Message -->
+                        {% if conversion.status == 'failed' and conversion.error_message %}
+                        <div class="mt-4 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md">
+                            <p class="text-sm text-red-700 dark:text-red-300">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                <strong>Error:</strong> {{ conversion.error_message|truncatechars:150 }}
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        <!-- Processing Indicator -->
+                        {% if conversion.status == 'processing' %}
+                        <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md">
+                            <p class="text-sm text-blue-700 dark:text-blue-300">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Your file is being converted. This may take a few minutes depending on the file size.
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         {% else %}
-        <div class="bg-white rounded-lg shadow-md p-8 text-center">
-            <h3 class="text-xl font-semibold mb-4">No Conversions Yet</h3>
-            <p class="text-gray-600 mb-4">You haven't converted any files yet.</p>
-            <a href="/converter/upload/" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">
-                Start Converting
+            <!-- Empty State -->
+            <div class="text-center py-12">
+                <div class="text-gray-400 dark:text-gray-500 text-6xl mb-4">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No conversions yet</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    You haven't converted any files yet. Start by uploading your first file!
+                </p>
+                <a href="/home/" 
+                   class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                    <i class="fas fa-cloud-upload-alt mr-2"></i> Convert Your First File
+                </a>
+            </div>
+        {% endif %}
+
+        <!-- Quick Action -->
+        <div class="mt-8">
+            <a href="/home/" 
+               class="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium rounded-lg transition-colors duration-200">
+                <i class="fas fa-home mr-2"></i> Back to Home
             </a>
         </div>
-        {% endif %}
     </div>
-</body>
-</html>
+</div>
+
+<!-- ✅ Real-Time AJAX Auto-Refresh -->
+<script>
+  function refreshProcessingStatus() {
+    const processingCards = document.querySelectorAll('[data-conversion-id][data-status="processing"]');
+
+    processingCards.forEach(card => {
+      const conversionId = card.getAttribute('data-conversion-id');
+      fetch(`/converter/status/${conversionId}/`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status && data.status !== 'processing') {
+          location.reload(); // Refresh when status changes
+        }
+      })
+      .catch(error => {
+        console.error('Status fetch error:', error);
+      });
+    });
+  }
+
+  setInterval(refreshProcessingStatus, 10000); // every 10 seconds
+</script>
+{% endblock %}

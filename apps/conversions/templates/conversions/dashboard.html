@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - PDF Converter{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Welcome, {{ user.username }}!
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300">
+                Manage your file conversions
+            </p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Convert File -->
+            <a href="{% url 'conversions:upload' %}" 
+               class="bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 p-6 rounded-lg text-center transition-colors duration-200">
+                <div class="text-blue-600 dark:text-blue-400 text-4xl mb-4">
+                    <i class="fas fa-file-import"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Convert File
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300 text-sm">
+                    Start a new file conversion
+                </p>
+            </a>
+            
+            <!-- View History -->
+            <a href="{% url 'conversions:history' %}" 
+               class="bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 p-6 rounded-lg text-center transition-colors duration-200">
+                <div class="text-green-600 dark:text-green-400 text-4xl mb-4">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    View History
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300 text-sm">
+                    See your conversion history
+                </p>
+            </a>
+            
+            <!-- Account Settings -->
+            <a href="#" 
+               class="bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 p-6 rounded-lg text-center transition-colors duration-200">
+                <div class="text-purple-600 dark:text-purple-400 text-4xl mb-4">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Account Settings
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300 text-sm">
+                    Manage your profile
+                </p>
+            </a>
+        </div>
+
+        <!-- Recent Conversions -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    Recent Conversions
+                </h2>
+                <a href="{% url 'conversions:history' %}" 
+                   class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                    View All
+                </a>
+            </div>
+            
+            {% if recent_conversions %}
+                <div class="space-y-4">
+                    {% for conversion in recent_conversions %}
+                    <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
+                        <div class="flex items-center">
+                            <div class="mr-4 text-blue-500">
+                                <i class="fas fa-file text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900 dark:text-white">
+                                    {{ conversion.original_filename|truncatechars:30 }}
+                                </h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ conversion.get_conversion_type_display }} • 
+                                    <span class="{% if conversion.status == 'completed' %}text-green-600{% elif conversion.status == 'failed' %}text-red-600{% else %}text-yellow-600{% endif %}">
+                                        {{ conversion.get_status_display }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ conversion.created_at|date:"M d" }}
+                            </p>
+                            {% if conversion.status == 'completed' %}
+                                <a href="{% url 'conversions:download' conversion.id %}" 
+                                   class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                                    Download
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <div class="text-gray-400 text-4xl mb-4">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <p class="text-gray-500 dark:text-gray-400">
+                        You haven't converted any files yet
+                    </p>
+                    <a href="{% url 'conversions:upload' %}" 
+                       class="mt-4 inline-block text-blue-600 dark:text-blue-400 hover:underline">
+                        Convert your first file
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

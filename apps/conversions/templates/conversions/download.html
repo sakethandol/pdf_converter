@@ -20,7 +20,9 @@
                     📥 Download Now
                 </button>
                 <br>
-                <a href="/converter/upload/" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">
+                <!-- UPDATED: Direct to upload page -->
+                <a href="/home/" 
+                   class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">
                     Convert Another File
                 </a>
             </div>
@@ -30,8 +32,8 @@
 
     <script>
         function downloadFile() {
-            // For now, just show an alert (we'll implement actual download later)
-            alert('Download functionality will be implemented next!');
+            // Actual download implementation
+            window.location.href = "{% if user.is_authenticated %}{% url 'conversions:download' conversion.id %}{% else %}{% url 'conversions:guest_download' conversion.id %}{% endif %}";
         }
     </script>
 </body>

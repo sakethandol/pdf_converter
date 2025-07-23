@@ -17,14 +17,15 @@
             
             <div class="flex items-center space-x-4">
                 {% if is_authenticated %}
-                    <span class="text-gray-600">Welcome, {{ username }}!</span>
+                    <span class="text-gray-600">Welcome, {{ user.username }}!</span>
+
                     <a href="/converter/history/" class="text-blue-500 hover:underline">History</a>
-                    <a href="/dashboard/" class="text-blue-500 hover:underline">Dashboard</a>
                     <a href="/logout/" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</a>
                 {% else %}
                     <a href="/login/" class="text-blue-500 hover:underline">Login</a>
                     <a href="/register/" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Sign Up</a>
                 {% endif %}
+                
             </div>
         </div>
     </header>
@@ -59,7 +60,10 @@
                     </button>
                 </div>
             </form>
+            
         </div>
+                  
+        
         {% endif %}
         {% if not is_authenticated %}
         <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">

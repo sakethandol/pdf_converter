@@ -22,24 +22,28 @@
         <form method="post" enctype="multipart/form-data" class="space-y-6">
             {% csrf_token %}
             
+            <!-- Debug Info (remove in production) -->
+            {% if user.is_authenticated %}
+                <!-- Hidden field to help debug -->
+                <input type="hidden" name="debug_user" value="{{ user.username }}">
+            {% endif %}
+            
             <!-- Conversion Type -->
             <div>
-                <label for="{{ form.conversion_type.id_for_label }}" 
-                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ form.conversion_type.label }}
-                </label>
+                {{ form.conversion_type.label_tag }}
                 {{ form.conversion_type }}
                 {% if form.conversion_type.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.conversion_type.errors.0 }}</p>
+                    <div class="mt-1 text-sm text-red-600">
+                        {% for error in form.conversion_type.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
                 {% endif %}
             </div>
 
             <!-- File Upload -->
             <div>
-                <label for="{{ form.original_file.id_for_label }}" 
-                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ form.original_file.label }}
-                </label>
+                {{ form.original_file.label_tag }}
                 
                 <!-- Custom File Upload Area -->
                 <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors duration-200">
@@ -53,14 +57,27 @@
                         Drag and drop your file here, or click to browse
                     </p>
                     <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                        Supported formats: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, JPEG
+                        {{ form.original_file.help_text|default:"Supported formats: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, JPEG" }}
                     </p>
                 </div>
                 
                 {% if form.original_file.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.original_file.errors.0 }}</p>
+                    <div class="mt-1 text-sm text-red-600">
+                        {% for error in form.original_file.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
                 {% endif %}
             </div>
+
+            <!-- Non-field errors -->
+            {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                    {% for error in form.non_field_errors %}
+                        <p class="text-sm text-red-600">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
             <!-- Submit Button -->
             <div class="text-center">
@@ -72,6 +89,7 @@
             </div>
         </form>
 
+        <!-- Supported Conversions -->
         <div class="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Supported Conversions
