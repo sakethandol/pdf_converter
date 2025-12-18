@@ -12,7 +12,7 @@
             --bg-secondary: #2d2d2d;
             --text-primary: #ffffff;
             --text-secondary: #b3b3b3;
-            --accent: #3b82f6;
+            --accent: #8b5cf6;
         }
         .dark {
             background-color: var(--bg-primary);
@@ -21,44 +21,82 @@
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
+        .gradient-purple-pink {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+        }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
-    <nav class="bg-white dark:bg-gray-800 shadow-lg">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
+    <nav class="bg-white dark:bg-gray-800 shadow-lg border-b-2 border-purple-100 dark:border-purple-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
+            <div class="flex justify-between h-20">
                 <div class="flex items-center">
-                    <a href="/" class="flex-shrink-0 flex items-center">
-                        <i class="fas fa-file-pdf text-2xl text-blue-600 mr-2"></i>
-                        <span class="font-bold text-xl text-gray-900 dark:text-white">PDF Converter</span>
+                    <a href="/" class="flex items-center space-x-3 group">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg blur opacity-50 group-hover:opacity-75 transition duration-300"></div>
+                            <div class="relative bg-gradient-to-r from-purple-600 to-pink-600 p-2.5 rounded-lg">
+                                <i class="fas fa-file-pdf text-2xl text-white"></i>
+                            </div>
+                        </div>
+                        <span class="font-bold text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                            PDF Converter
+                        </span>
                     </a>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
                     {% if user.is_authenticated %}
-                        <!-- Existing Links -->
                         <a href="{% url 'conversions:upload' %}" 
-                           class="text-gray-700 dark:text-gray-300 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                            Upload
+                           class="relative text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-purple-50 dark:hover:bg-purple-900/20 group">
+                            <i class="fas fa-upload mr-2"></i>
+                            <span>Upload</span>
+                            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-pink-600 group-hover:w-full transition-all duration-300"></span>
                         </a>
+                        
                         <a href="{% url 'conversions:history' %}" 
-                           class="text-gray-700 dark:text-gray-300 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                            History
+                           class="relative text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-purple-50 dark:hover:bg-purple-900/20 group">
+                            <i class="fas fa-history mr-2"></i>
+                            <span>History</span>
+                            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-pink-600 group-hover:w-full transition-all duration-300"></span>
                         </a>
-                        <a href="/logout/" 
-                           class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                            Logout
-                        </a>
+                        <div class="flex items-center space-x-3 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg">
+                                <div class="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-semibold text-sm">{{ user.username.0|upper }}</span>
+                                </div>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ user.username }}</span>
+                            </div>
+                            
+                            <a href="/logout/" 
+                               class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                Logout
+                            </a>
+                        </div>
                     {% else %}
-                        <!-- <a href="{% url 'conversions:guest_convert' %}" 
-                           class="text-gray-700 dark:text-gray-300 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
-                            Convert File
-                        </a> -->
                         <a href="/login/" 
-                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                           class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-2.5 rounded-lg text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-purple-600 hover:border-purple-700">
+                            <i class="fas fa-sign-in-alt mr-2"></i>
                             Login
                         </a>
+                        
                         <a href="/register/" 
-                           class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                           class="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-pink-500 hover:border-pink-600">
+                            <i class="fas fa-user-plus mr-2"></i>
                             Register
                         </a>
                     {% endif %}
@@ -67,39 +105,100 @@
         </div>
     </nav>
     {% if messages %}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} bg-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-100 border border-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-400 text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-700 px-4 py-3 rounded mb-4">
-                    {{ message }}
+                <div class="alert alert-{{ message.tags }} 
+                    {% if message.tags == 'error' %}
+                        bg-red-50 border-l-4 border-red-500 text-red-800 dark:bg-red-900/20 dark:text-red-200
+                    {% elif message.tags == 'success' %}
+                        bg-green-50 border-l-4 border-green-500 text-green-800 dark:bg-green-900/20 dark:text-green-200
+                    {% elif message.tags == 'warning' %}
+                        bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200
+                    {% else %}
+                        bg-blue-50 border-l-4 border-blue-500 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200
+                    {% endif %}
+                    px-6 py-4 rounded-lg mb-4 shadow-md flex items-start space-x-3 animate-fade-in">
+                    <div class="flex-shrink-0 mt-0.5">
+                        {% if message.tags == 'error' %}
+                            <i class="fas fa-exclamation-circle text-xl text-red-500"></i>
+                        {% elif message.tags == 'success' %}
+                            <i class="fas fa-check-circle text-xl text-green-500"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="fas fa-exclamation-triangle text-xl text-yellow-500"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle text-xl text-blue-500"></i>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium">{{ message }}</p>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
-    <main class="py-8">
+    
+    <!-- Main Content -->
+    <main class="flex-grow">
         {% block content %}
         {% endblock %}
     </main>
-    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
+    
+    <!-- Enhanced Footer -->
+    <footer class="bg-white dark:bg-gray-800 border-t-2 border-purple-100 dark:border-purple-900 mt-auto">
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <p class="text-gray-500 dark:text-gray-400 text-sm">
-                    © PDF_Convereter: Andol Saketh
-                </p>
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <!-- Left Section -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-2 rounded-lg">
+                        <i class="fas fa-file-pdf text-xl text-white"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-800 dark:text-gray-200 font-semibold">PDF Converter</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-xs">Transform documents with ease</p>
+                    </div>
+                </div>
+                
+                <!-- Center Section -->
+                <div class="text-center">
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">
+                        © 2025 PDF Converter | Created by 
+                        <span class="font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                            Andol Saketh
+                        </span>
+                    </p>
+                </div>
+                
+                <!-- Right Section - Social Links -->
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com/" class="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="www.linkedin.com/in/andol-saketh" class="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </footer>
+    
     <script>
+        // Auto-dismiss alerts after 5 seconds
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(function(alert) {
-                alert.style.transition = 'opacity 0.5s';
+                alert.style.transition = 'opacity 0.5s, transform 0.5s';
                 alert.style.opacity = '0';
+                alert.style.transform = 'translateX(100%)';
                 setTimeout(function() {
                     alert.remove();
                 }, 500);
             });
         }, 5000);
     </script>
+    
     {% block extra_js %}
     {% endblock %}
 </body>

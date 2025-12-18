@@ -18,3 +18,33 @@ python-magic>=0.4.27  # For file type detection
 # Development dependencies (optional)
 # python-decouple>=3.8  # For environment variables
 # django-extensions>=3.2.0  # Useful Django extensions
+
+
+# Core libraries (already have these)
+pip install PyPDF2 pdf2docx python-docx Pillow reportlab openpyxl
+
+# Additional for better quality:
+pip install PyMuPDF  # For PDF to image (high quality)
+pip install tabula-py  # For PDF to Excel table extraction
+pip install pdf2image  # Alternative PDF to image
+pip install comtypes  # Windows only - Word to PDF
+
+# For Linux Word to PDF, install LibreOffice:
+sudo apt-get install libreoffice
+
+# For tabula-py, you need Java:
+sudo apt-get install default-jre
+
+# Core libraries (required)
+pip install PyPDF2 pdf2docx python-docx Pillow reportlab openpyxl
+
+# Word to PDF - BEST method (uses MS Word)
+pip install pywin32
+
+# Word to PDF - Backup method
+pip install docx2pdf
+
+# Optional: Better quality conversions
+pip install PyMuPDF              # Better PDF to Image
+pip install tabula-py             # Better PDF to Excel (table detection)
+pip install openpyxl              # Excel support

@@ -61,10 +61,10 @@
                                 <!-- Action Buttons -->
                                 <div class="flex gap-2 flex-wrap">
                                     {% if conversion.status == 'completed' %}
-                                        <a href="{% url 'conversions:download' file_id=conversion.id %}" 
-                                           class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
-                                            <i class="fas fa-download mr-2"></i> Download
-                                        </a>
+                                 <a href="{% url 'conversions:download' file_id=conversion.id %}" 
+   class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+    <i class="fas fa-download mr-2"></i> Download
+</a>
                                     {% elif conversion.status == 'processing' %}
                                         <a href="{% url 'conversions:convert_detail' conversion_id=conversion.id %}" 
                                            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
