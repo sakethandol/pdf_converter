@@ -7,8 +7,7 @@ from django.utils import timezone
 from datetime import timedelta
 import os
 
-# Ensure the import path matches your project structure
-from django.conf import settings
+from django.conf import settings 
 from .models import ConversionRequest
 from .forms import FileUploadForm
 
@@ -20,29 +19,33 @@ class FileUploadView(LoginRequiredMixin, FormView):
     
     def form_valid(self, form):
         try:
+            # STEP 1: Create the object but don't save to DB yet
             conversion = form.save(commit=False)
-            conversion.user = self.request.user
-            uploaded_file = self.request.FILES.get('original_file')
             
-            if not uploaded_file:
-                messages.error(self.request, "No file detected in upload.")
-                return self.form_invalid(form)
-
+            # STEP 2: Manually attach the logged-in user
+            conversion.user = self.request.user
+            
+            # STEP 3: Handle file metadata
+            uploaded_file = self.request.FILES.get('original_file')
             conversion.original_filename = uploaded_file.name
             conversion.file_size = uploaded_file.size
-            conversion.save()
             
+            # STEP 4: Save to the database immediately
+            # This 'locks' the User ID into the record before conversion starts
+            conversion.save() 
+            
+            # STEP 5: Run conversion
             success = conversion.safe_process_conversion()
             
             if success:
-                messages.success(self.request, 'File uploaded and converted successfully!')
+                messages.success(self.request, 'Converted successfully!')
             else:
-                messages.warning(self.request, f'Conversion failed: {conversion.error_message}')
+                messages.warning(self.request, f'Failed: {conversion.error_message}')
                 
             return redirect('conversions:convert_detail', conversion_id=conversion.id)
             
         except Exception as e:
-            messages.error(self.request, f'Critical Error: {str(e)}')
+            messages.error(self.request, f'Error: {str(e)}')
             return self.form_invalid(form)
 
 class GuestConvertView(FormView):
@@ -53,7 +56,7 @@ class GuestConvertView(FormView):
     def form_valid(self, form):
         try:
             conversion = form.save(commit=False)
-            conversion.user = None 
+            conversion.user = None # Explicitly guest
             uploaded_file = self.request.FILES.get('original_file')
             
             conversion.original_filename = uploaded_file.name
@@ -95,6 +98,7 @@ class FileDownloadView(View):
             response = FileResponse(file_handle, as_attachment=True)
             response['Content-Disposition'] = f'attachment; filename="{conversion.converted_filename}"'
             
+            # Atomic update for download count
             ConversionRequest.objects.filter(id=file_id).update(download_count=conversion.download_count + 1)
             return response
         except Exception as e:

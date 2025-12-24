@@ -10,7 +10,7 @@ from django.contrib import messages
 def simple_logout(request):
     logout(request)
     messages.success(request, 'Logged out successfully!')
-    return redirect('users:login') # Redirecting to login is standard after logout
+    return redirect('users:login') # Ensure 'users:login' matches your users/urls.py name
 
 urlpatterns = [
     # Admin Interface
@@ -20,17 +20,19 @@ urlpatterns = [
     path('logout/', simple_logout, name='logout'),
     
     # App-specific routes
-    # Note: We use the namespace defined inside the app's urls.py
+    # Linking to your conversions app
     path('converter/', include('apps.conversions.urls')),
     
-    # Landing page and user authentication
+    # Landing page and user authentication (Login/Register)
     path('', include('apps.users.urls')),
 ]
 
-# Serve static and media files during development
-# This is CRITICAL for your PDF downloads and CSS/JS to work
+# --- THE CRITICAL MEDIA/STATIC ADDITION ---
+# This allows Django to serve the PDFs generated in your 'media' folder 
+# and the CSS/JS files in your 'static' folder while you are developing.
 if settings.DEBUG:
-    # Standard static files (CSS, JS)
+    # 1. Serve static files (CSS, JavaScript, Images for UI)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    # Uploaded and Converted files
+    
+    # 2. Serve media files (Uploaded files and the CONVERTED PDFs)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
