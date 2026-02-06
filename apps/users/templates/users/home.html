@@ -1,94 +1,379 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>PDF Converter - Fast & Free</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turbo_PDF - Fast & Free</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Animated gradient background */
+        @keyframes gradientShift {
+            0%, 100% { transform: translate(-50%, 0) scale(1); }
+            50% { transform: translate(-50%, -10%) scale(1.1); }
+        }
+
+        .bg-animated {
+            animation: gradientShift 15s ease-in-out infinite;
+        }
+
+        /* Custom Select Dropdown Styling */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            display: block;
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.25rem;
+            border-radius: 1rem;
+            border: 3px solid #00272b;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            color: #000000;            
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 39, 43, 0.08);
+            position: relative;
+        }
+     
+
+        select:hover {
+            border-color: #4a7a3a;
+            box-shadow: 0 6px 25px rgba(74, 122, 58, 0.15);
+            transform: translateY(-2px);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #e0ff4f;
+            box-shadow: 0 0 0 4px rgba(224, 255, 79, 0.2), 0 8px 30px rgba(224, 255, 79, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Custom dropdown arrow */
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #00272b;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .select-wrapper:hover::after {
+            border-top-color: #4a7a3a;
+        }
+
+        .select-wrapper:focus-within::after {
+            border-top-color: #e0ff4f;
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        /* File Input Styling */
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border-radius: 1rem;
+            border: 3px dashed #00272b;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            color: #00272b;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 39, 43, 0.08);
+        }
+
+        input[type="file"]:hover {
+            border-color: #4a7a3a;
+            background: linear-gradient(135deg, #f8fffe 0%, #efffed 100%);
+            box-shadow: 0 6px 25px rgba(74, 122, 58, 0.15);
+            transform: translateY(-2px);
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #e0ff4f;
+            border-style: solid;
+            box-shadow: 0 0 0 4px rgba(224, 255, 79, 0.2), 0 8px 30px rgba(224, 255, 79, 0.25);
+        }
+
+        input[type="file"]::file-selector-button {
+            margin-right: 1rem;
+            padding: 0.5rem 1.25rem;
+            background: #00272b;
+            color: #e0ff4f;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: #4a7a3a;
+            transform: scale(1.05);
+        }
+
+        /* Placeholder styling */
+        ::placeholder {
+            color: #00272b;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+
+        /* Pulse animation for convert button */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 10px 40px rgba(224, 255, 79, 0.3);
+            }
+            50% {
+                box-shadow: 0 10px 60px rgba(224, 255, 79, 0.5);
+            }
+        }
+
+        .btn-convert {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        /* Icon animations */
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .icon-bounce:hover i {
+            animation: iconBounce 0.6s ease-in-out infinite;
+        }
+
+        /* Form card hover effect */
+        .form-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 39, 43, 0.2);
+        }
+
+        /* Feature card hover */
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(224, 255, 79, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            border-color: #e0ff4f;
+        }
+
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #00272b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4a7a3a;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e0ff4f;
+        }
+
+        /* Label icon animation */
+        .label-icon {
+            transition: transform 0.3s ease;
+        }
+
+        label:hover .label-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        /* Floating animation for decorative elements */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
 </head>
-<body  class="relative min-h-screen bg-gradient-to-tr from-pink-200 via-purple-200 to-blue-200">
-  <div class="absolute inset-0 -z-10 overflow-hidden">
-    <div class="absolute left-1/2 top-0 -translate-x-1/2 blur-3xl w-[1000px] h-[800px] opacity-60"
-         style="background: radial-gradient(circle at center, #fbcfe8 20%, #c4b5fd 60%, #a5b4fc 100%)">
+<body class="relative min-h-screen bg-[#00272b] text-white overflow-x-hidden">
+    
+    <!-- Animated Background -->
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div class="absolute left-1/2 top-0 -translate-x-1/2 blur-[120px] w-[1000px] h-[800px] opacity-40 bg-animated"
+             style="background: radial-gradient(circle at center, #e0ff4f 30%, #4a7a3a 50%, #00272b 80%)">
+        </div>
     </div>
-  </div>
-    <header class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/"class="text-2xl font-bold text-blue-600">PDF Converter</a>
 
+    <!-- Header -->
+    <header class="backdrop-blur-md bg-[#00272b]/60 border-b border-[#e0ff4f]/20 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-2 group">
+                <div class="bg-[#e0ff4f] p-1.5 rounded-lg group-hover:rotate-12 transition-transform duration-300">
+                    <i class="fas fa-file-pdf text-[#00272b] text-xl"></i>
+                </div>
+                <span class="text-xl tracking-tighter text-white">Turbo<span class="text-[#e0ff4f]">_</span>PDF</span>
+            </a>
             
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-3 sm:space-x-6">
                 {% if is_authenticated %}
-                    <span class="text-gray-600">Welcome, {{ user.username }}!</span>
-
-                    <a href="/converter/history/" class="text-blue-500 hover:underline">History</a>
-                    <a href="/logout/" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</a>
+                    <span class="hidden sm:block text-sm  text-[#e0ff4f]">Hi, {{ user.username }}</span>
+                    <a href="/converter/history/" class="text-sm  hover:text-[#e0ff4f] transition-colors duration-300">History</a>
+                    <a href="/logout/" class="bg-red-500/20 text-red-400 border border-red-500/50 px-3 py-1.5 rounded-lg text-xs  hover:bg-red-500 hover:text-white transition-all duration-300">Logout</a>
                 {% else %}
-                    <a href="/login/" class="text-blue-500 hover:underline">Login</a>
-                    <a href="/register/" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Sign Up</a>
+                    <a href="/login/" class="text-sm  hover:text-[#e0ff4f] transition-colors duration-300">Login</a>
+                    <a href="/register/" class="bg-[#e0ff4f] text-[#00272b] px-4 py-2 rounded-lg text-sm  hover:scale-105 transition-transform duration-300 shadow-lg shadow-[#e0ff4f]/20">Sign Up</a>
                 {% endif %}
-                
             </div>
         </div>
     </header>
 
-    <!-- Main Conversion Area -->
-    <main class="max-w-6xl mx-auto py-8 px-4">
+    <main class="max-w-4xl mx-auto py-12 px-4 sm:px-6">
+        
         <!-- Hero Section -->
-        <div class="text-center mb-8">
-            <h2 class="text-4xl font-bold text-white-700 mb-4">Convert Files Instantly</h2>
-            <p class="text-xl text-white-600">Fast, free, and secure file conversion.</p>
+        <div class="text-center mb-12">
+            <h2 class="text-4xl sm:text-6xl mb-4 leading-tight">
+                Convert Files <span class="text-[#e0ff4f]">Instantly</span>
+                <span class="inline-block ml-2 float-animation">⚡</span>
+            </h2>
+            <p class="text-lg sm:text-xl text-gray-400 ">Professional grade conversion. Zero cost. Maximum speed.</p>
         </div>
 
         <!-- Conversion Form -->
         {% if form %}
-        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
-            <form method="post" action="/converter/guest-convert/" enctype="multipart/form-data" class="space-y-6">
+        <div class="form-card bg-gradient-to-br from-[#e0ff4f] to-[#00272b] rounded-3xl shadow-2xl p-6 sm:p-10 mb-12 border-b-8 border-[#e0ff4f]">
+            <form method="post" action="/converter/guest-convert/" enctype="multipart/form-data" class="space-y-8">
                 {% csrf_token %}
                 
-                <div class="grid md:grid-cols-2 gap-6">
-                   <div>
-                        <label class="block text-blue-800 text-sm font-bold mb-2">Conversion Type:</label>
-                        {{ form.conversion_type }}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Conversion Type -->
+                    <div class="space-y-3">
+                        <label class="flex items-center text-black text-sm  uppercase tracking-wider">
+                            <i class="fas fa-exchange-alt mr-2 text-black label-icon"></i> Conversion Type
+                        </label>
+                        <div class="select-wrapper text-black">
+                            {{ form.conversion_type }}
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-blue-800 text-sm font-bold mb-2">Select File:</label>
-                        {{ form.original_file }}
+
+                    <!-- File Upload -->
+                    <div class="space-y-3">
+                        <label class="flex items-center text-black text-sm  uppercase tracking-wider">
+                            <i class="fas fa-cloud-upload-alt mr-2 text-black label-icon"></i> Select File
+                        </label>
+                        <div>
+                            {{ form.original_file }}
+                        </div>
                     </div>
                 </div>
-                <div class="text-center">
-                    <button type="submit" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105">
-                        🚀 Convert Now
+
+                <!-- Convert Button -->
+                <div class="text-center pt-4">
+                    <button type="submit" class="btn-convert icon-bounce w-full sm:w-auto bg-[#00272b] text-[#e0ff4f] px-12 py-5 rounded-2xl text-xl font-black shadow-xl hover:bg-[#003d44] transition-all duration-300 transform hover:-translate-y-1 active:scale-95 flex items-center justify-center mx-auto">
+                        <i class="fas fa-rocket mr-3"></i> Convert Now
                     </button>
+                    <p class="mt-4 text-xs text-gray-500 font-bold uppercase tracking-widest">
+                        <i class="fas fa-check-circle text-green-600 mr-1"></i>
+                        Supports PDF, DOCX, JPG, PNG
+                    </p>
                 </div>
             </form>
-            
         </div>
-                  
-        
         {% endif %}
+
+        <!-- CTA for Non-Authenticated Users -->
         {% if not is_authenticated %}
-        <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
-            <div class="text-center">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">🎯 Get More with Free Account</h3>
-                <div class="grid md:grid-cols-3 gap-4 mb-6">
-                    <div class="text-center">
-                        <div class="text-2xl mb-2">📁</div>
-                        <p class="text-sm text-gray-600">Conversion History</p>
+        <div class="bg-gradient-to-br from-[#00383d] to-[#00272b] rounded-3xl p-8 border border-[#e0ff4f]/20 shadow-xl relative overflow-hidden group">
+            <i class="fas fa-rocket absolute -right-4 -bottom-4 text-9xl text-[#e0ff4f]/5 -rotate-12 transition-transform duration-700 group-hover:scale-110 group-hover:rotate-0"></i>
+            
+            <div class="relative z-10 text-center">
+                <h3 class="text-2xl sm:text-3xl font-black text-[#e0ff4f] mb-8">
+                    <i class="fas fa-star mr-2"></i>
+                    Unlock Pro Features for Free
+                </h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                    <div class="feature-card bg-[#00272b]/50 p-6 rounded-2xl border-2 border-[#e0ff4f]/10">
+                        <div class="text-[#e0ff4f] text-3xl mb-3">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <p class="text-sm font-bold uppercase text-white">Full History</p>
+                        <p class="text-xs text-gray-400 mt-2">Access all conversions</p>
                     </div>
-                    <div class="text-center">
-                        <div class="text-2xl mb-2">⚡</div>
-                        <p class="text-sm text-gray-600">Faster Processing</p>
+                    <div class="feature-card bg-[#00272b]/50 p-6 rounded-2xl border-2 border-[#e0ff4f]/10">
+                        <div class="text-[#e0ff4f] text-3xl mb-3">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <p class="text-sm font-bold uppercase text-white">Instant Speed</p>
+                        <p class="text-xs text-gray-400 mt-2">Priority processing</p>
                     </div>
-                    <div class="text-center">
-                        <div class="text-2xl mb-2">💾</div>
-                        <p class="text-sm text-gray-600">Save Downloads</p>
+                    <div class="feature-card bg-[#00272b]/50 p-6 rounded-2xl border-2 border-[#e0ff4f]/10">
+                        <div class="text-[#e0ff4f] text-3xl mb-3">
+                            <i class="fas fa-save"></i>
+                        </div>
+                        <p class="text-sm font-bold uppercase text-white">Cloud Storage</p>
+                        <p class="text-xs text-gray-400 mt-2">Save unlimited files</p>
                     </div>
                 </div>
-                <a href="/register/" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg text-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105">
+
+                <a href="/register/" class="inline-flex items-center bg-[#e0ff4f] text-[#00272b] px-10 py-4 rounded-xl text-lg font-black hover:scale-105 transition-transform duration-300 shadow-lg shadow-[#e0ff4f]/30">
+                    <i class="fas fa-user-plus mr-2"></i>
                     Create Free Account
                 </a>
             </div>
         </div>
         {% endif %}
+
     </main>
+
+    <!-- Footer -->
+    <footer class="py-10 text-center text-gray-500 text-sm font-bold border-t border-[#e0ff4f]/10 mt-12">
+        <p>© 2026 Turbo_PDF Converter</p>
+        <p class="text-xs mt-2">Powered by <span class="text-[#e0ff4f]">Andol Saketh</span></p>
+    </footer>
+
 </body>
 </html>

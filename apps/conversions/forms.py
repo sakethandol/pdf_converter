@@ -8,10 +8,10 @@ class FileUploadForm(forms.ModelForm):
         fields = ['conversion_type', 'original_file']
         widgets = {
             'conversion_type': forms.Select(attrs={
-                'class': 'w-full px-3 py-2 border bg-gray-700 border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white'
+                'class': 'w-full px-3 py-2 border bg-gray-700 border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black'
             }),
             'original_file': forms.ClearableFileInput(attrs={
-                'class': 'w-full px-3 py-2 border bg-gray-700 border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white',
+                'class': 'w-full px-3 py-2 border bg-gray-700 border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black',
                 'accept': '.pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg'
             })
         }
@@ -22,7 +22,6 @@ class FileUploadForm(forms.ModelForm):
         self.fields['original_file'].label = "Select File"
         self.fields['conversion_type'].required = True
         self.fields['original_file'].required = True
-        # Match help text to validation limit (50MB is safer for web apps)
         self.fields['original_file'].help_text = "Supported: PDF, Word, Excel, Images (Max: 50MB)"
     
     def clean_original_file(self):
@@ -30,8 +29,6 @@ class FileUploadForm(forms.ModelForm):
         
         if not uploaded_file:
             raise forms.ValidationError("Please select a file to upload.")
-        
-        # Consistent 50MB limit
         if uploaded_file.size > 50 * 1024 * 1024:
             raise forms.ValidationError("File size cannot exceed 50MB for stability.")
         

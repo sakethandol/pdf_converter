@@ -23,7 +23,6 @@ class ConversionRequest(models.Model):
         ('image_to_pdf', 'Image to PDF'),
     ]
 
-    # --- Fields ---
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     conversion_type = models.CharField(max_length=20, choices=CONVERSION_TYPES)
     original_file = models.FileField(upload_to=user_upload_path)
@@ -36,8 +35,6 @@ class ConversionRequest(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     completed_at = models.DateTimeField(blank=True, null=True)
     download_count = models.IntegerField(default=0)
-
-    # --- Methods ---
 
     def safe_process_conversion(self):
         """
